@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AR Viewer</title>
+    <link rel="stylesheet" href="./css/style.css">
+
+    <script type="importmap">
+    {
+      "imports": {
+        "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/",
+        "mindar-image-three": "https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-three.prod.js"
+      }
+    }
+    </script>
+
+    <script type="module" src="./js/main.js"></script>
+  </head>
+
+  <body>
+
+    <!-- ══ SPLASH SCREEN ══ -->
+    <div id="splash">
+      <div class="splash-bg"></div>
+      <div class="grid-lines"></div>
+
+      <div class="corner-deco tl"></div>
+      <div class="corner-deco tr"></div>
+      <div class="corner-deco bl"></div>
+      <div class="corner-deco br"></div>
+
+      <div class="splash-content">
+        <div class="splash-icon">
+          <div class="ring ring-1"></div>
+          <div class="ring ring-2"></div>
+          <div class="ring ring-3"></div>
+          <div class="dot"></div>
+        </div>
+
+        <div class="splash-title">
+          <span>AR</span><span> &nbsp;</span><span>Vision</span>
+        </div>
+
+        <div class="splash-subtitle">Image Target Detection System</div>
+
+        <div class="splash-status" id="splash-status">● SYSTEM READY</div>
+
+        <div class="splash-btn-group">
+          <button class="btn-ar btn-start" id="startButton">▶ &nbsp;Iniciar AR</button>
+          <button class="btn-ar btn-stop" id="stopButton">■ &nbsp;Detener</button>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ══ AR CONTAINER ══ -->
+    <div id="container"></div>
+
+
+    <!-- ══ HUD ══ -->
+    <div id="hud">
+      <div class="scan-overlay"></div>
+
+      <div class="hud-corner tl"></div>
+      <div class="hud-corner tr"></div>
+      <div class="hud-corner bl"></div>
+      <div class="hud-corner br"></div>
+
+      <div class="hud-topbar">AR VISION &nbsp;·&nbsp; TRACKING ACTIVO</div>
+
+      <button class="hud-stop-btn" id="hudStopButton">■ Stop</button>
+
+      <div class="hud-hint" id="hudHint">APUNTA LA CÁMARA A UN TARGET</div>
+
+      <!-- Info card (se llena desde JS) -->
+      <div id="target-card">
+        <div class="card-header">
+          <div class="card-status-dot"></div>
+          <div class="card-header-label">TARGET DETECTADO</div>
+          <div class="card-close">[ HUD ]</div>
+        </div>
+        <div class="card-grid">
+          <div class="card-field">
+            <div class="field-label">ID</div>
+            <div class="field-value accent" id="hud-id">—</div>
+          </div>
+          <div class="card-field">
+            <div class="field-label">Tag</div>
+            <div class="field-value" id="hud-tag">—</div>
+          </div>
+          <div class="card-field">
+            <div class="field-label">Color</div>
+            <div class="field-value">
+              <span class="color-swatch">
+                <span class="swatch-dot" id="hud-swatch"></span>
+                <span id="hud-color">—</span>
+              </span>
+            </div>
+          </div>
+          <div class="card-field">
+            <div class="field-label">Info extra</div>
+            <div class="field-value" id="hud-extra">—</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </body>
+</html>

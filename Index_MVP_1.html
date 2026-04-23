@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AR Experience</title>
+
+    <!-- Fuentes -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+
+    <script type="importmap">
+    {
+      "imports": {
+        "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/",
+        "mindar-image-three": "https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-three.prod.js"
+      }
+    }
+    </script>
+
+    <script type="module">
+      import * as THREE from 'three';
+      import { MindARThree } from 'mindar-image-three';
+      import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+
+      const mindarThree = new MindARThree({
+        container: document.querySelector("#container"),
+        imageTargetSrc: "./target/Pachito_1.mind",
+      });
+
+      const { renderer, scene, camera } = mindarThree;
+      const anchor = mindarThree.addAnchor(0);
+
+      // Luces
+      const hemi = new THREE.HemisphereLight(0xffffff, 0xbbbbff, 1);
+      scene.add(hemi);
+      const dir = new THREE.DirectionalLight(0xffffff, 1.5);
+      dir.position.set(0, 2, 2);
+      scene.add(dir);
+
+      // Luz de acento naranja
+      const pointLight = new THREE.PointLight(0xff6a00, 2, 3);
+      pointLight.position.set(-1, 1, 1);
+      scene.add(pointLight);
+
+      // Partículas flotantes sobre el modelo
+      const particleGeo = new THREE.BufferGeometry();
+      const count = 120;
+      const positions = new Float32Array(count * 3);
+      for (let i = 0; i < count; i++) {
+        positions[i * 3]     = (Math.random() - 0.5) * 1.5;
+        positions[i * 3 + 1] = (Math.random() - 0.5) * 1.5;
+        positions[i * 3 + 2] = (Math.random() - 0.5) * 1.5;
+      }
+      particleGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+      const particleMat = new THREE.PointsMaterial({ color: 0xff6a00, size: 0.015, transparent: true, opacity: 0.8 });
+      const particles = new THREE.Points(particleGeo, particleMat);
+      anchor.group.add(particles);
+
+      // Anillo decorativo
+      const ringGeo = new THREE.TorusGeometry(0.55, 0.008, 16, 100);
+      const ringMat = new THREE.MeshStandardMaterial({ color: 0xff6a00, emissive: 0xff6a00, emissiveIntensity: 0.6 });
+      const ring = new THREE.Mesh(ringGeo, ringMat);
+      ring.rotation.x = Math.PI / 2;
+      anchor.group.add(ring);
+
+      // Anillo exterior
+      const ring2Geo = new THREE.TorusGeometry(0.7, 0.004, 16, 100);
+      const ring2Mat = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xffffff, emissiveIntensity: 0.3, transparent: true, opacity: 0.5 });
+      const ring2 = new THREE.Mesh(ring2Geo, ring2Mat);
+      ring2.rotation.x = Math.PI / 2;
+      anchor.group.add(ring2);
+
+      // Modelo GLB
+      const loader = new GLTFLoader();
+      let mixer;
+      loader.load('./assets/3d/modelo.glb', (gltf) => {
+        const model = gltf.scene;
+        model.scale.set(0.5, 0.5, 0.5);
+        model.position.set(0, 0, 0);
+        anchor.group.add(model);
+
+        if (gltf.animations && gltf.animations.length) {
+          mixer = new THREE.AnimationMixer(model);
+          mixer.clipAction(gltf.animations[0]).play();
+        }
+      });
+
+      // Eventos del anchor para mostrar/ocultar el HUD
+      anchor.onTargetFound = () => {
+        document.getElementById('hud').classList.add('visible');
+        document.getElementById('scanPrompt').classList.add('hidden');
+      };
+      anchor.onTargetLost = () => {
+        document.getElementById('hud').classList.remove('visible');
+        document.getElementById('scanPrompt').classList.remove('hidden');
+      };
+
+      const clock = new THREE.Clock();
+
+      const start = async () => {
+        await mindarThree.start();
+        document.getElementById('splash').classList.add('hidden');
+        document.getElementById('scanPrompt').classList.remove('hidden');
+        document.getElementById('control').classList.add('visible');
+
+        renderer.setAnimationLoop(() => {
+          const delta = clock.getDelta();
+          const t = clock.elapsedTime;
+
+          // Animar partículas
+          particles.rotation.y = t * 0.3;
+          particles.rotation.x = t * 0.1;
+
+          // Pulso en el anillo
+          ring.scale.setScalar(1 + Math.sin(t * 2) * 0.04);
+          ring2.rotation.z = t * 0.5;
+
+          // Pulso en la luz de acento
+          pointLight.intensity = 1.5 + Math.sin(t * 3) * 0.5;
+
+          if (mixer) mixer.update(delta);
+
+          renderer.render(scene, camera);
+        });
+      };
+
+      document.getElementById('startButton').addEventListener('click', start);
+      document.getElementById('stopButton').addEventListener('click', () => {
+        mindarThree.stop();
+        renderer.setAnimationLoop(null);
+        document.getElementById('splash').classList.remove('hidden');
+        document.getElementById('scanPrompt').classList.add('hidden');
+        document.getElementById('hud').classList.remove('visible');
+        document.getElementById('control').classList.remove('visible');
+      });
+    </script>
+
+    <style>
+      *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+      :root {
+        --accent: #ff6a00;
+        --accent2: #ee0979;
+        --glass: rgba(10, 10, 15, 0.6);
+        --text: #f0ede8;
+        --dim: rgba(240, 237, 232, 0.55);
+      }
+
+      body { background: #000; font-family: 'DM Sans', sans-serif; overflow: hidden; }
+
+      /* ── CONTAINER AR ── */
+      #container {
+        width: 100vw;
+        height: 100vh;
+        position: relative;
+        overflow: hidden;
+      }
+
+      /* ── SPLASH ── */
+      #splash {
+        position: fixed; inset: 0; z-index: 100;
+        background: linear-gradient(135deg, #0a0a0f 0%, #1a0a00 100%);
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        gap: 32px;
+        transition: opacity 0.6s ease;
+      }
+      #splash.hidden { opacity: 0; pointer-events: none; }
+
+      .splash-logo {
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: clamp(3rem, 12vw, 7rem);
+        letter-spacing: 0.12em;
+        background: linear-gradient(90deg, var(--accent), var(--accent2));
+        -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        text-align: center;
+        line-height: 1;
+        filter: drop-shadow(0 0 40px rgba(255,106,0,0.4));
+      }
+      .splash-sub {
+        color: var(--dim);
+        font-size: 0.9rem;
+        letter-spacing: 0.3em;
+        text-transform: uppercase;
+        text-align: center;
+      }
+
+      .btn-group { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+
+      button {
+        font-family: 'DM Sans', sans-serif;
+        font-size: 0.85rem;
+        font-weight: 500;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        border: none;
+        cursor: pointer;
+        padding: 14px 36px;
+        border-radius: 4px;
+        transition: all 0.25s ease;
+      }
+
+      #startButton {
+        background: linear-gradient(90deg, var(--accent), var(--accent2));
+        color: #fff;
+        box-shadow: 0 0 30px rgba(255,106,0,0.4);
+      }
+      #startButton:hover { filter: brightness(1.15); transform: translateY(-2px); box-shadow: 0 0 50px rgba(255,106,0,0.6); }
+
+      #stopButton {
+        background: transparent;
+        color: var(--dim);
+        border: 1px solid rgba(240,237,232,0.2);
+      }
+      #stopButton:hover { border-color: var(--accent); color: var(--accent); }
+
+      /* ── SCAN PROMPT ── */
+      #scanPrompt {
+        position: fixed; bottom: 42px; left: 50%; transform: translateX(-50%);
+        z-index: 50;
+        display: flex; flex-direction: column; align-items: center; gap: 14px;
+        transition: opacity 0.4s ease;
+      }
+      #scanPrompt.hidden { opacity: 0; pointer-events: none; }
+
+      .scan-ring {
+        width: 72px; height: 72px;
+        border: 2px solid var(--accent);
+        border-radius: 50%;
+        position: relative;
+        animation: spin 3s linear infinite;
+      }
+      .scan-ring::before {
+        content: '';
+        position: absolute; inset: 6px;
+        border: 1px dashed rgba(255,106,0,0.4);
+        border-radius: 50%;
+        animation: spin-rev 2s linear infinite;
+      }
+      .scan-ring::after {
+        content: '';
+        position: absolute; top: 50%; left: 50%; width: 8px; height: 8px;
+        background: var(--accent);
+        border-radius: 50%;
+        transform: translate(-50%,-50%);
+        box-shadow: 0 0 12px var(--accent);
+      }
+      @keyframes spin { to { transform: rotate(360deg); } }
+      @keyframes spin-rev { to { transform: rotate(-360deg); } }
+
+      .scan-label {
+        color: var(--dim);
+        font-size: 0.75rem;
+        letter-spacing: 0.25em;
+        text-transform: uppercase;
+        text-align: center;
+      }
+
+      /* ── HUD OVERLAY ── */
+      #hud {
+        position: fixed; inset: 0; z-index: 30;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.5s ease;
+      }
+      #hud.visible { opacity: 1; }
+
+      /* Esquinas decorativas */
+      .corner {
+        position: absolute;
+        width: 40px; height: 40px;
+        border-color: var(--accent);
+        border-style: solid;
+      }
+      .corner-tl { top: 20px; left: 20px; border-width: 2px 0 0 2px; }
+      .corner-tr { top: 20px; right: 20px; border-width: 2px 2px 0 0; }
+      .corner-bl { bottom: 20px; left: 20px; border-width: 0 0 2px 2px; }
+      .corner-br { bottom: 20px; right: 20px; border-width: 0 2px 2px 0; }
+
+      /* Panel izquierdo */
+      .hud-panel-left {
+        position: absolute;
+        top: 50%; left: 0;
+        transform: translateY(-50%);
+        display: flex; flex-direction: column; gap: 8px;
+        padding: 0 0 0 16px;
+        animation: slideInLeft 0.6s ease forwards;
+      }
+
+      @keyframes slideInLeft {
+        from { opacity: 0; transform: translateY(-50%) translateX(-30px); }
+        to   { opacity: 1; transform: translateY(-50%) translateX(0); }
+      }
+
+      .hud-stat {
+        background: var(--glass);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255,106,0,0.25);
+        border-left: 3px solid var(--accent);
+        padding: 10px 16px;
+        border-radius: 0 8px 8px 0;
+        min-width: 140px;
+      }
+      .hud-stat-label {
+        font-size: 0.62rem;
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+        color: var(--accent);
+        margin-bottom: 3px;
+      }
+      .hud-stat-value {
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 1.4rem;
+        color: var(--text);
+        letter-spacing: 0.05em;
+      }
+
+      /* Panel inferior */
+      .hud-bottom {
+        position: absolute;
+        bottom: 0; left: 0; right: 0;
+        padding: 20px;
+        display: flex; align-items: flex-end; justify-content: space-between;
+        animation: slideUp 0.6s ease forwards;
+      }
+      @keyframes slideUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to   { opacity: 1; transform: translateY(0); }
+      }
+
+      .hud-title-block { max-width: 60%; }
+      .hud-title {
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: clamp(2rem, 6vw, 3.5rem);
+        color: var(--text);
+        letter-spacing: 0.08em;
+        line-height: 1;
+        text-shadow: 0 0 40px rgba(255,106,0,0.5);
+      }
+      .hud-title span {
+        background: linear-gradient(90deg, var(--accent), var(--accent2));
+        -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      }
+      .hud-desc {
+        font-size: 0.78rem;
+        color: var(--dim);
+        margin-top: 6px;
+        max-width: 280px;
+        line-height: 1.6;
+        letter-spacing: 0.04em;
+      }
+
+      /* Badge de estado */
+      .hud-badge {
+        background: var(--glass);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255,106,0,0.3);
+        border-radius: 40px;
+        padding: 10px 20px;
+        display: flex; align-items: center; gap: 8px;
+        font-size: 0.72rem;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--text);
+      }
+      .badge-dot {
+        width: 8px; height: 8px;
+        background: #00ff88;
+        border-radius: 50%;
+        box-shadow: 0 0 8px #00ff88;
+        animation: blink 1.5s ease-in-out infinite;
+      }
+      @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+      /* Panel superior derecho — tags */
+      .hud-tags {
+        position: absolute;
+        top: 20px; right: 20px;
+        display: flex; flex-direction: column; gap: 6px; align-items: flex-end;
+        animation: slideInRight 0.6s ease forwards;
+      }
+      @keyframes slideInRight {
+        from { opacity: 0; transform: translateX(20px); }
+        to   { opacity: 1; transform: translateX(0); }
+      }
+      .tag {
+        background: var(--glass);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(240,237,232,0.12);
+        padding: 5px 12px;
+        border-radius: 4px;
+        font-size: 0.68rem;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--dim);
+      }
+      .tag.active {
+        border-color: rgba(255,106,0,0.5);
+        color: var(--accent);
+      }
+
+      /* Línea de escaneo animada */
+      .scan-line {
+        position: absolute;
+        left: 0; right: 0;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, var(--accent), transparent);
+        opacity: 0.4;
+        animation: scanMove 4s linear infinite;
+        pointer-events: none;
+      }
+      @keyframes scanMove {
+        0%   { top: 0%; }
+        100% { top: 100%; }
+      }
+
+      /* Control fijo (siempre visible durante AR) */
+      #control {
+        position: fixed; top: 16px; left: 50%; transform: translateX(-50%);
+        z-index: 200;
+        display: none; gap: 8px;
+      }
+      #control.visible { display: flex; }
+      #control button { padding: 10px 20px; font-size: 0.75rem; }
+    </style>
+  </head>
+
+  <body>
+    <!-- SPLASH -->
+    <div id="splash">
+      <div class="splash-logo">AR<br>EXPERIENCE</div>
+      <div class="splash-sub">Realidad aumentada · Apunta tu cámara</div>
+      <div class="btn-group">
+        <button id="startButton">▶ Iniciar AR</button>
+        <button id="stopButton">⏹ Detener</button>
+      </div>
+    </div>
+
+    <!-- SCAN PROMPT (después de iniciar, antes de detectar) -->
+    <div id="scanPrompt" class="hidden">
+      <div class="scan-ring"></div>
+      <div class="scan-label">Apunta al marcador</div>
+    </div>
+
+    <!-- HUD (cuando target detectado) -->
+    <div id="hud">
+      <!-- Esquinas -->
+      <div class="corner corner-tl"></div>
+      <div class="corner corner-tr"></div>
+      <div class="corner corner-bl"></div>
+      <div class="corner corner-br"></div>
+
+      <!-- Línea de escaneo -->
+      <div class="scan-line"></div>
+
+      <!-- Stats izquierda -->
+      <div class="hud-panel-left">
+        <div class="hud-stat">
+          <div class="hud-stat-label">Estado</div>
+          <div class="hud-stat-value">ACTIVO</div>
+        </div>
+        <div class="hud-stat">
+          <div class="hud-stat-label">Tracking</div>
+          <div class="hud-stat-value">100%</div>
+        </div>
+        <div class="hud-stat">
+          <div class="hud-stat-label">Profundidad</div>
+          <div class="hud-stat-value">AR·3D</div>
+        </div>
+      </div>
+
+      <!-- Tags superior derecha -->
+      <div class="hud-tags">
+        <div class="tag active">✦ Modelo 3D</div>
+        <div class="tag">Realidad Aumentada</div>
+        <div class="tag">WebXR</div>
+      </div>
+
+      <!-- Panel inferior -->
+      <div class="hud-bottom">
+        <div class="hud-title-block">
+          <div class="hud-title">OBJETO<br><span>DETECTADO</span></div>
+          <div class="hud-desc">Modelo 3D renderizado en tiempo real sobre tu marcador. Mueve el dispositivo para explorar desde todos los ángulos.</div>
+        </div>
+        <div class="hud-badge">
+          <div class="badge-dot"></div>
+          Live · AR
+        </div>
+      </div>
+    </div>
+
+    <!-- Contenedor AR -->
+    <div id="container"></div>
+
+    <!-- Botones de control visibles durante AR -->
+    <div id="control">
+      <button id="startButton">▶ Start</button>
+      <button id="stopButton">⏹ Stop</button>
+    </div>
+  </body>
+</html>

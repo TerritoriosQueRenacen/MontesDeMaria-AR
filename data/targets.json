@@ -1,0 +1,16 @@
+[
+  {
+    "id": "TGT-001",
+    "tag": "Cubo Rojo",
+    "color": "#FF2244",
+    "colorName": "Rojo",
+    "extra": "Prioridad Alta"
+  },
+  {
+    "id": "TGT-002",
+    "tag": "Cubo Azul",
+    "color": "#0066FF",
+    "colorName": "Azul",
+    "extra": "Prioridad Media"
+  }
+]
