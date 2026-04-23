@@ -9,13 +9,13 @@ import { MindARThree } from 'mindar-image-three';
 // ══════════════════════════════════════════════
 const CONFIG = [
   {
-    id: 'Casa almirante',
+    id: 'Casa del almirante',
     tag: '2004',
     color: 0xff2244,
     colorHex: '#FF2244',
-    colorName: 'Carme de bolibar',
-    extra: 'población y fuerza publica',
-    modelo: 'Casa Almirante.glb ',
+    colorName: 'Carme De Bolivar',
+    extra: 'Población y fuerza publica',
+    modelo: 'CasaDeAlmirante.glb ',
   },
   {
     id: 'TGT-002',
@@ -36,12 +36,12 @@ const CONFIG = [
     modelo: 'Armada_1.glb',
   },
   {
-    id: 'TGT-004',
-    tag: 'Telar',
+    id: 'Telar',
+    tag: '2000',
     color: 0x0066ff,
     colorHex: '#ff00f2',
-    colorName: 'Pink',
-    extra: 'Prioridad Media',
+    colorName: 'San Juan Nepomuceno',
+    extra: 'La mujer es el elemento central',
     modelo: 'Telar.glb',
   },
   // ← sigue agregando objetos aquí para más targets

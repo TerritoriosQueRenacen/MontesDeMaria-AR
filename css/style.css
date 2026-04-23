@@ -7,13 +7,13 @@
 }
 
 :root {
-  --neon-cyan: #000000;
-  --neon-magenta: #ff00cc;
-  --neon-yellow: #ffe600;
-  --neon-green: #00ff88;
+  --neon-cyan: #491010;
+  --neon-magenta: #01533f;
+  --neon-yellow: #300505;
+  --neon-green: #10492f;
   --dark-bg: #080c14;
   --panel-bg: rgba(8, 12, 20, 0.85);
-  --border-glow: rgba(119, 91, 0, 0.4);
+  --border-glow: rgba(182, 175, 152, 0.4);
 }
 
 body {
@@ -33,7 +33,9 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: var(--dark-bg);
+  background-image: url("../assets/img/fondos/FondoIndex.png");
+  background-repeat: no-repeat;
+  background-size: cover;
   transition: opacity 0.6s ease, visibility 0.6s;
 }
 
@@ -50,6 +52,8 @@ body {
     radial-gradient(ellipse at 20% 50%, rgba(0,245,255,0.08) 0%, transparent 60%),
     radial-gradient(ellipse at 80% 30%, rgba(255,0,204,0.08) 0%, transparent 60%),
     radial-gradient(ellipse at 60% 80%, rgba(0,255,136,0.06) 0%, transparent 50%);
+    
+
 }
 
 .grid-lines {
@@ -183,24 +187,24 @@ body {
 
 .btn-start {
   background: var(--neon-cyan);
-  color: #080c14;
-  box-shadow: 0 0 24px rgba(0,245,255,0.4);
+  color: #fdfeff;
+  box-shadow: 0 0 24px rgba(82, 27, 2, 0.4);
 }
 
 .btn-start:hover {
-  box-shadow: 0 0 40px rgba(0,245,255,0.7);
+  box-shadow: 0 0 40px rgba(65, 3, 3, 0.7);
 }
 
 .btn-stop {
   background: transparent;
   color: var(--neon-magenta);
   border: 2px solid var(--neon-magenta) !important;
-  box-shadow: 0 0 12px rgba(255,0,204,0.2);
+  box-shadow: 0 0 12px rgba(3, 119, 13, 0.2);
 }
 
 .btn-stop:hover {
-  background: rgba(255,0,204,0.1);
-  box-shadow: 0 0 24px rgba(255,0,204,0.4);
+  background: rgba(4, 128, 86, 0.1);
+  box-shadow: 0 0 24px rgba(0, 255, 55, 0.4);
 }
 
 .corner-deco {
@@ -333,7 +337,7 @@ body {
 
 .card-close {
   font-size: 0.65rem;
-  color: rgba(255,255,255,0.3);
+  color: rgba(51, 2, 2, 0.3);
   font-family: 'Share Tech Mono', monospace;
 }
 
@@ -357,7 +361,7 @@ body {
   font-family: 'Share Tech Mono', monospace;
   font-size: 0.6rem;
   letter-spacing: 0.18em;
-  color: rgba(255,255,255,0.35);
+  color: rgba(43, 2, 2, 0.35);
   text-transform: uppercase;
 }
 
@@ -365,7 +369,7 @@ body {
   font-family: 'Exo 2', sans-serif;
   font-weight: 600;
   font-size: 1rem;
-  color: #fff;
+  color: #000000;
 }
 
 .field-value.accent { color: var(--neon-cyan); }
