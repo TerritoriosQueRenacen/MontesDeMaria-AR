@@ -89,7 +89,7 @@ body {
 }
 
 .splash-icon .ring-1 {
-  border-top-color: var(--neon-cyan);
+  border-top-color: var(--neon-green);
   border-right-color: var(--neon-cyan);
   animation: spin 2s linear infinite;
 }
@@ -131,13 +131,13 @@ body {
 }
 
 .splash-title span:nth-child(1) { color: var(--neon-cyan); }
-.splash-title span:nth-child(2) { color: #fff; }
+.splash-title span:nth-child(2) { color: #210909; }
 .splash-title span:nth-child(3) { color: var(--neon-magenta); }
 
 .splash-subtitle {
   font-family: 'Share Tech Mono', monospace;
   font-size: 0.85rem;
-  color: rgba(255,255,255,0.45);
+  color: rgb(55, 8, 8);
   letter-spacing: 0.2em;
   text-transform: uppercase;
 }
