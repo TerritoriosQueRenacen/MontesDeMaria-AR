@@ -22,6 +22,8 @@ body {
   overflow: hidden;
   width: 100vw;
   height: 100vh;
+  /* Evita el scroll y "pull-to-refresh" al rotar el modelo en móviles */
+  touch-action: none; 
 }
 
 /* ── SPLASH SCREEN ── */
@@ -52,8 +54,6 @@ body {
     radial-gradient(ellipse at 20% 50%, rgba(0,245,255,0.08) 0%, transparent 60%),
     radial-gradient(ellipse at 80% 30%, rgba(255,0,204,0.08) 0%, transparent 60%),
     radial-gradient(ellipse at 60% 80%, rgba(0,255,136,0.06) 0%, transparent 50%);
-    
-
 }
 
 .grid-lines {
@@ -225,6 +225,7 @@ body {
   height: 100vh;
   position: relative;
   overflow: hidden;
+  touch-action: none; /* Asegura que no haya interferencia táctil en el contenedor AR */
 }
 
 
@@ -353,6 +354,11 @@ body {
   gap: 0.2rem;
 }
 
+/* Fuerza al 4to elemento (Dato) a ocupar todo el ancho para textos largos */
+.card-field:nth-child(4) {
+  grid-column: 1 / -1;
+}
+
 .card-field.full {
   grid-column: 1 / -1;
 }
@@ -373,20 +379,6 @@ body {
 }
 
 .field-value.accent { color: var(--neon-cyan); }
-
-.color-swatch {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.swatch-dot {
-  width: 14px;
-  height: 14px;
-  border-radius: 3px;
-  display: inline-block;
-  flex-shrink: 0;
-}
 
 /* Scan line overlay */
 .scan-overlay {

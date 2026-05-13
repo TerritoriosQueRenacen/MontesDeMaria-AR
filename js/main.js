@@ -1,21 +1,15 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-
 import { MindARThree } from 'mindar-image-three';
 
-// ══════════════════════════════════════════════
-//  CONFIGURACIÓN DE TARGETS
-//  Agrega tantos objetos como targets tengas en tu .mind
-// ══════════════════════════════════════════════
-// ══════════════════════════════════════════════
-//  CONFIGURACIÓN DE TARGETS
+
 // ══════════════════════════════════════════════
 const CONFIG = [
   {
     id: 'Casa del almirante',
     fecha: '2004',
     ubicacion: 'Carmen De Bolivar',
-    dato: 'Población y fuerza publica, apoyo significativo al pueblo',
+    dato: 'Población y fuerza publica',
     modelo: 'CasaDeAlmirante.glb',
   },
   {
@@ -27,10 +21,10 @@ const CONFIG = [
   },
   {
     id: 'Cerro de la cansona',
-    fecha: '1994', 
+    fecha: 'Contiene mirador La Ceiba',
     ubicacion: 'Carmen de Bolivar',
-    dato: 'Una emboscada en la zona cercana al cerro, marcada por la violencia que azoto la región',
-    modelo: 'Caidos.glb',
+    dato: 'A casi 600 metros sobre el mar',
+    modelo: 'Mapa.glb',
   },
   {
     id: 'Apoyo Armada',
@@ -39,7 +33,6 @@ const CONFIG = [
     dato: 'Representa el agradecimiento, respeto y admiración a las fuerzas por su apoyo',
     modelo: 'Caidos.glb',
   },
-
 ];
 
 // ══════════════════════════════════════════════
@@ -75,6 +68,7 @@ function hideTargetInfo() {
   hudCard.classList.remove('visible');
   hudHint.classList.remove('hidden');
 }
+
 // ══════════════════════════════════════════════
 //  SETUP MINDAR
 // ══════════════════════════════════════════════
@@ -87,6 +81,7 @@ const mindarThree = new MindARThree({
 const { renderer, scene, camera } = mindarThree;
 
 const cubes = [];
+const modelosCargados = []; // Aquí guardamos las referencias de los GLTF para poder rotarlos
 let activeTargets = 0;
 
 CONFIG.forEach((cfg, index) => {
@@ -94,24 +89,29 @@ CONFIG.forEach((cfg, index) => {
 
   const cube = new THREE.Mesh(
     new THREE.BoxGeometry(0.5, 0.5, 0.5),
-    new THREE.MeshStandardMaterial({ color: cfg.color })
+    new THREE.MeshStandardMaterial({ color: 0xffffff })
   );
 
-   // Modelo GLB
-      const loader = new GLTFLoader();
-      let mixer;
-      var linkModel = './assets/3d/Armada/' + cfg.modelo;
-      loader.load(linkModel , (gltf) => {
-        const model = gltf.scene;
-        model.scale.set(0.2, 0.2, 0.2);
-        model.position.set(0, 0, 0);
-        anchor.group.add(model);
+  // Carga del Modelo GLB
+  const loader = new GLTFLoader();
+  let mixer;
+  
+  if (cfg.modelo) {
+    var linkModel = './assets/3d/Armada/' + cfg.modelo;
+    loader.load(linkModel, (gltf) => {
+      const model = gltf.scene;
+      model.scale.set(0.2, 0.2, 0.2);
+      model.position.set(0, 0, 0);
+      anchor.group.add(model);
 
-        if (gltf.animations && gltf.animations.length) {
-          mixer = new THREE.AnimationMixer(model);
-          mixer.clipAction(gltf.animations[0]).play();
-        }
-      });
+      modelosCargados.push(model); // Guardamos la referencia para el touch
+
+      if (gltf.animations && gltf.animations.length) {
+        mixer = new THREE.AnimationMixer(model);
+        mixer.clipAction(gltf.animations[0]).play();
+      }
+    });
+  }
 
   cube.visible = false;
   //anchor.group.add(cube);
@@ -121,7 +121,7 @@ CONFIG.forEach((cfg, index) => {
     cube.visible = true;
     activeTargets++;
     showTargetInfo(cfg);
-    console.log(`Target ${index} detectado →`, cfg.tag);
+    console.log(`Target ${index} detectado →`, cfg.id);
   };
 
   anchor.onTargetLost = () => {
@@ -143,16 +143,14 @@ scene.add(light);
 //  START / STOP
 // ══════════════════════════════════════════════
 const startAR = async () => {
-  // Ocultar splash, mostrar HUD
   splashEl.classList.add('hidden');
   hudEl.classList.add('active');
 
   await mindarThree.start();
 
   renderer.setAnimationLoop(() => {
-    cubes.forEach((cube) => {
-      if (cube.visible) cube.rotation.y += 0.02;
-    });
+    // Si usas el mixer de animaciones, debes actualizarlo aquí.
+    // La rotación automática la hemos quitado para que no pelee con el control manual.
     renderer.render(scene, camera);
   });
 };
@@ -170,3 +168,53 @@ const stopAR = () => {
 startBtn.addEventListener('click', startAR);
 stopBtn.addEventListener('click', stopAR);
 hudStopBtn.addEventListener('click', stopAR);
+
+// ══════════════════════════════════════════════
+//  CONTROLES TÁCTILES / MOUSE PARA ROTACIÓN
+// ══════════════════════════════════════════════
+let isDragging = false;
+let previousPosition = { x: 0, y: 0 };
+const interaccionArea = document.getElementById('container'); 
+
+const onPointerDown = (e) => {
+  isDragging = true;
+  previousPosition.x = e.touches ? e.touches[0].clientX : e.clientX;
+  previousPosition.y = e.touches ? e.touches[0].clientY : e.clientY;
+};
+
+const onPointerMove = (e) => {
+  if (!isDragging) return;
+
+  const currentX = e.touches ? e.touches[0].clientX : e.clientX;
+  const currentY = e.touches ? e.touches[0].clientY : e.clientY;
+
+  const deltaX = currentX - previousPosition.x;
+  const deltaY = currentY - previousPosition.y;
+
+  const rotationSpeed = 0.01; 
+
+  modelosCargados.forEach((modelo) => {
+    // Rotamos solo si el ancla del modelo está visible
+    if (modelo.parent && modelo.parent.visible) {
+      modelo.rotation.y += deltaX * rotationSpeed; 
+      modelo.rotation.x += deltaY * rotationSpeed; 
+    }
+  });
+
+  previousPosition = { x: currentX, y: currentY };
+};
+
+const onPointerUp = () => {
+  isDragging = false;
+};
+
+// Listeners Touch
+interaccionArea.addEventListener('touchstart', onPointerDown, { passive: true });
+interaccionArea.addEventListener('touchmove', onPointerMove, { passive: true });
+interaccionArea.addEventListener('touchend', onPointerUp);
+interaccionArea.addEventListener('touchcancel', onPointerUp);
+
+// Listeners Mouse
+interaccionArea.addEventListener('mousedown', onPointerDown);
+interaccionArea.addEventListener('mousemove', onPointerMove);
+window.addEventListener('mouseup', onPointerUp);
