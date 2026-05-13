@@ -31,7 +31,7 @@ const CONFIG = [
     fecha: '1997-2005',
     ubicacion: 'Carmen de Bolivar',
     dato: 'Representa el agradecimiento, respeto y admiración a las fuerzas por su apoyo',
-    modelo: 'Caidos.glb',
+    modelo: 'Caidos2.glb',
   },
 ];
 
