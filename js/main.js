@@ -7,36 +7,39 @@ import { MindARThree } from 'mindar-image-three';
 //  CONFIGURACIÓN DE TARGETS
 //  Agrega tantos objetos como targets tengas en tu .mind
 // ══════════════════════════════════════════════
+// ══════════════════════════════════════════════
+//  CONFIGURACIÓN DE TARGETS
+// ══════════════════════════════════════════════
 const CONFIG = [
   {
     id: 'Casa del almirante',
-    tag: '2004',
-    colorName: 'Carmen De Bolivar',
-    extra: 'Población y fuerza publica',
-    modelo: 'CasaDeAlmirante.glb ',
+    fecha: '2004',
+    ubicacion: 'Carmen De Bolivar',
+    dato: 'Población y fuerza publica, apoyo significativo al pueblo',
+    modelo: 'CasaDeAlmirante.glb',
   },
   {
     id: 'Mujeres de Montes De María',
-    tag: '2000',
-    colorName: 'Mampujan y San Jacinto',
-    extra: 'Los tejidos fueron un elementos clave como herramienta para la paz',
+    fecha: '2000',
+    ubicacion: 'Mampujan y San Jacinto',
+    dato: 'Los tejidos fueron un elementos clave como herramienta para la paz',
     modelo: 'Telar.glb',
   },
   {
     id: 'Cerro de la cansona',
-    tag: 'Contiene mirador La Ceiba',
-    colorName: 'Carmen de Bolivar',
-    extra: 'A casi 600 metros sobre el mar',
-    modelo: 'Mapa.glb',
+    fecha: '1994', 
+    ubicacion: 'Carmen de Bolivar',
+    dato: 'Una emboscada en la zona cercana al cerro, marcada por la violencia que azoto la región',
+    modelo: 'Caidos.glb',
   },
   {
     id: 'Apoyo Armada',
-    tag: '1997-2005',
-    colorName: 'Carmen de Bolivar',
-    extra: 'Representa el agradecimiento, respeto y admiración a las fuerzas por su apoyo',
-    modelo: '',
+    fecha: '1997-2005',
+    ubicacion: 'Carmen de Bolivar',
+    dato: 'Representa el agradecimiento, respeto y admiración a las fuerzas por su apoyo',
+    modelo: 'Caidos.glb',
   },
-  // ← sigue agregando objetos aquí para más targets
+
 ];
 
 // ══════════════════════════════════════════════
@@ -48,24 +51,21 @@ const startBtn   = document.getElementById('startButton');
 const stopBtn    = document.getElementById('stopButton');
 const hudStopBtn = document.getElementById('hudStopButton');
 
-const hudCard    = document.getElementById('target-card');
-const hudHint    = document.getElementById('hudHint');
-const hudId      = document.getElementById('hud-id');
-const hudTag     = document.getElementById('hud-tag');
-const hudColor   = document.getElementById('hud-color');
-const hudSwatch  = document.getElementById('hud-swatch');
-const hudExtra   = document.getElementById('hud-extra');
+const hudCard      = document.getElementById('target-card');
+const hudHint      = document.getElementById('hudHint');
+const hudId        = document.getElementById('hud-id');
+const hudFecha     = document.getElementById('hud-fecha');
+const hudUbicacion = document.getElementById('hud-ubicacion');
+const hudDato      = document.getElementById('hud-dato');
 
 // ══════════════════════════════════════════════
 //  HUD — actualizar info de un target
 // ══════════════════════════════════════════════
 function showTargetInfo(cfg) {
-  hudId.textContent     = cfg.id;
-  hudTag.textContent    = cfg.tag;
-  hudColor.textContent  = cfg.colorName;
-  hudSwatch.style.background = cfg.colorHex;
-  hudSwatch.style.boxShadow  = `0 0 8px ${cfg.colorHex}`;
-  hudExtra.textContent  = cfg.extra;
+  hudId.textContent        = cfg.id;
+  hudFecha.textContent     = cfg.fecha;
+  hudUbicacion.textContent = cfg.ubicacion;
+  hudDato.textContent      = cfg.dato;
 
   hudCard.classList.add('visible');
   hudHint.classList.add('hidden');
@@ -75,7 +75,6 @@ function hideTargetInfo() {
   hudCard.classList.remove('visible');
   hudHint.classList.remove('hidden');
 }
-
 // ══════════════════════════════════════════════
 //  SETUP MINDAR
 // ══════════════════════════════════════════════
