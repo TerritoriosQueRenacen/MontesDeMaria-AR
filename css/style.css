@@ -35,7 +35,7 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background-image: url("../assets/img/fondos/FondoAR.png");
+  background-image: url("../assets/img/fondos/ElFondoAR.png");
   background-repeat: no-repeat;
   background-size: cover;
   transition: opacity 0.6s ease, visibility 0.6s;
@@ -260,7 +260,7 @@ body {
   font-family: 'Share Tech Mono', monospace;
   font-size: 0.7rem;
   letter-spacing: 0.2em;
-  color: rgba(0,245,255,0.6);
+  color: rgb(2, 255, 2);
   text-transform: uppercase;
   white-space: nowrap;
 }
@@ -284,7 +284,7 @@ body {
   cursor: pointer;
   transition: background 0.2s;
 }
-.hud-stop-btn:hover { background: rgba(255,0,204,0.15); }
+.hud-stop-btn:hover { background: rgba(0, 117, 63, 0.15); }
 
 /* Info card */
 #target-card {
@@ -314,7 +314,7 @@ body {
   align-items: center;
   gap: 0.7rem;
   margin-bottom: 1rem;
-  border-bottom: 1px solid rgba(0,245,255,0.15);
+  color: rgb(2, 255, 2);
   padding-bottom: 0.7rem;
 }
 
@@ -403,7 +403,7 @@ body {
   font-family: 'Share Tech Mono', monospace;
   font-size: 0.7rem;
   letter-spacing: 0.18em;
-  color: rgba(0,245,255,0.35);
+  color: rgb(2, 255, 2);
   text-transform: uppercase;
   white-space: nowrap;
   transition: opacity 0.3s;
