@@ -74,7 +74,7 @@ function hideTargetInfo() {
 // ══════════════════════════════════════════════
 const mindarThree = new MindARThree({
   container: document.querySelector('#container'),
-  imageTargetSrc: './target/targets_Armada.mind',
+  imageTargetSrc: './target/TestTarget.mind',
   maxTrack: CONFIG.length,
 });
 
