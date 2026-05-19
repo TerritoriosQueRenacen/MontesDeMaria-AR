@@ -2,7 +2,6 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { MindARThree } from 'mindar-image-three';
 
-
 // ══════════════════════════════════════════════
 const CONFIG = [
   {
@@ -76,6 +75,9 @@ const mindarThree = new MindARThree({
   container: document.querySelector('#container'),
   imageTargetSrc: './target/targets_Armada.mind',
   maxTrack: CONFIG.length,
+  // ── FILTROS DE ESTABILIZACIÓN (One Euro Filter) ──
+  filterMinCF: 0.0001, // Controla el temblor cuando la postal AR está quieta
+  filterBeta: 0.001    // Controla el temblor durante el movimiento rápido
 });
 
 const { renderer, scene, camera } = mindarThree;
