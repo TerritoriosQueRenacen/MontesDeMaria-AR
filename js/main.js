@@ -55,9 +55,9 @@ const hudDato      = document.getElementById('hud-dato');
 // ══════════════════════════════════════════════
 function showTargetInfo(cfg) {
   hudId.textContent        = cfg.id;
-  if(hudFecha) hudFecha.textContent         = cfg.fecha;
-  if(hudUbicacion) hudUbicacion.textContent = cfg.ubicacion;
-  if(hudDato) hudDato.textContent           = cfg.dato;
+  hudFecha.textContent     = cfg.fecha;
+  hudUbicacion.textContent = cfg.ubicacion;
+  hudDato.textContent      = cfg.dato;
 
   hudCard.classList.add('visible');
   hudHint.classList.add('hidden');
@@ -93,59 +93,37 @@ CONFIG.forEach((cfg, index) => {
     new THREE.BoxGeometry(0.5, 0.5, 0.5),
     new THREE.MeshStandardMaterial({ color: 0xffffff })
   );
-  cube.visible = false;
-  cubes.push(cube);
 
-  // Variables para controlar la carga diferida (Lazy Loading)
-  let isModelLoaded = false;
+  // Carga del Modelo GLB
+  const loader = new GLTFLoader();
   let mixer;
+  
+  if (cfg.modelo) {
+    var linkModel = './assets/3d/Armada/' + cfg.modelo;
+    loader.load(linkModel, (gltf) => {
+      const model = gltf.scene;
+      model.scale.set(0.2, 0.2, 0.2);
+      model.position.set(0, 0, 0);
+      anchor.group.add(model);
+
+      modelosCargados.push(model); // Guardamos la referencia para el touch
+
+      if (gltf.animations && gltf.animations.length) {
+        mixer = new THREE.AnimationMixer(model);
+        mixer.clipAction(gltf.animations[0]).play();
+      }
+    });
+  }
+
+  cube.visible = false;
+  //anchor.group.add(cube);
+  cubes.push(cube);
 
   anchor.onTargetFound = () => {
     cube.visible = true;
     activeTargets++;
     showTargetInfo(cfg);
     console.log(`Target ${index} detectado →`, cfg.id);
-
-    // ── LAZY LOADING: Solo cargamos si el modelo no ha sido descargado antes ──
-    if (!isModelLoaded && cfg.modelo) {
-      
-      // Feedback visual de carga en la tarjeta HUD
-      if(hudDato) {
-        hudDato.textContent = "⚙️ Descargando modelo 3D...";
-        hudDato.classList.add('accent');
-      }
-
-      const loader = new GLTFLoader();
-      const linkModel = './assets/3d/Armada/' + cfg.modelo;
-
-      loader.load(linkModel, (gltf) => {
-        const model = gltf.scene;
-        model.scale.set(0.2, 0.2, 0.2);
-        model.position.set(0, 0, 0);
-        anchor.group.add(model);
-
-        modelosCargados.push(model); // Guardamos la referencia para el touch
-
-        if (gltf.animations && gltf.animations.length) {
-          mixer = new THREE.AnimationMixer(model);
-          mixer.clipAction(gltf.animations[0]).play();
-        }
-        
-        isModelLoaded = true; // Evitamos que se vuelva a cargar en el próximo escaneo
-
-        // Restaurar el texto original de la tarjeta si este target sigue siendo el activo
-        if (hudDato && hudId.textContent === cfg.id) {
-          hudDato.textContent = cfg.dato;
-          hudDato.classList.remove('accent');
-        }
-
-      }, undefined, (error) => {
-        console.error("Error al cargar el modelo:", error);
-        if (hudDato && hudId.textContent === cfg.id) {
-          hudDato.textContent = "⚠️ Error al cargar el modelo.";
-        }
-      });
-    }
   };
 
   anchor.onTargetLost = () => {
@@ -173,6 +151,8 @@ const startAR = async () => {
   await mindarThree.start();
 
   renderer.setAnimationLoop(() => {
+    // Si usas el mixer de animaciones, debes actualizarlo aquí.
+    // La rotación automática la hemos quitado para que no pelee con el control manual.
     renderer.render(scene, camera);
   });
 };
