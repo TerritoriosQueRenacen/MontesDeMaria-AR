@@ -55,9 +55,9 @@ const hudDato      = document.getElementById('hud-dato');
 // ══════════════════════════════════════════════
 function showTargetInfo(cfg) {
   hudId.textContent        = cfg.id;
-  hudFecha.textContent     = cfg.fecha;
-  hudUbicacion.textContent = cfg.ubicacion;
-  hudDato.textContent      = cfg.dato;
+  if(hudFecha) hudFecha.textContent         = cfg.fecha;
+  if(hudUbicacion) hudUbicacion.textContent = cfg.ubicacion;
+  if(hudDato) hudDato.textContent           = cfg.dato;
 
   hudCard.classList.add('visible');
   hudHint.classList.add('hidden');
@@ -76,8 +76,8 @@ const mindarThree = new MindARThree({
   imageTargetSrc: './target/targets_Armada.mind',
   maxTrack: CONFIG.length,
   // ── FILTROS DE ESTABILIZACIÓN (One Euro Filter) ──
-  filterMinCF: 0.0001, // Controla el temblor cuando la postal AR está quieta
-  filterBeta: 0.001    // Controla el temblor durante el movimiento rápido
+  filterMinCF: 0.0001, 
+  filterBeta: 0.001    
 });
 
 const { renderer, scene, camera } = mindarThree;
@@ -93,13 +93,15 @@ CONFIG.forEach((cfg, index) => {
     new THREE.BoxGeometry(0.5, 0.5, 0.5),
     new THREE.MeshStandardMaterial({ color: 0xffffff })
   );
+  cube.visible = false;
+  cubes.push(cube);
 
-  // Carga del Modelo GLB
+  // ── CARGA ANTICIPADA (Pre-loading models upfront) ──
   const loader = new GLTFLoader();
   let mixer;
   
   if (cfg.modelo) {
-    var linkModel = './assets/3d/Armada/' + cfg.modelo;
+    const linkModel = './assets/3d/Armada/' + cfg.modelo;
     loader.load(linkModel, (gltf) => {
       const model = gltf.scene;
       model.scale.set(0.2, 0.2, 0.2);
@@ -114,10 +116,6 @@ CONFIG.forEach((cfg, index) => {
       }
     });
   }
-
-  cube.visible = false;
-  //anchor.group.add(cube);
-  cubes.push(cube);
 
   anchor.onTargetFound = () => {
     cube.visible = true;
@@ -151,8 +149,6 @@ const startAR = async () => {
   await mindarThree.start();
 
   renderer.setAnimationLoop(() => {
-    // Si usas el mixer de animaciones, debes actualizarlo aquí.
-    // La rotación automática la hemos quitado para que no pelee con el control manual.
     renderer.render(scene, camera);
   });
 };
