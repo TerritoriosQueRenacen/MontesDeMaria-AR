@@ -263,7 +263,7 @@ body {
   font-weight: 700;
   font-size: 0.8rem;
   letter-spacing: 0.15em;
-  color: rgba(0,245,255,0.6);
+  color: rgb(72, 255, 0);
   text-transform: uppercase;
   white-space: nowrap;
 }
@@ -407,7 +407,7 @@ body {
   font-family: 'Share Tech Mono', monospace;
   font-size: 0.7rem;
   letter-spacing: 0.18em;
-  color: rgba(0,245,255,0.35);
+  color: rgb(72, 255, 0);
   text-transform: uppercase;
   white-space: nowrap;
   transition: opacity 0.3s;
