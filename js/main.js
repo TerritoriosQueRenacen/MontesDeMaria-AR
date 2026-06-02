@@ -9,7 +9,7 @@ const CONFIG = [
     fecha: '2004',
     ubicacion: 'Carmen De Bolivar',
     dato: 'Población y fuerza publica',
-    modelo: 'CasaDeAlmirante.glb',
+    modelo: 'casita.glb',
   },
   {
     id: 'Mujeres de Montes De María',
