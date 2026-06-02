@@ -73,7 +73,7 @@ function hideTargetInfo() {
 // ══════════════════════════════════════════════
 const mindarThree = new MindARThree({
   container: document.querySelector('#container'),
-  imageTargetSrc: './target/targets_Armada.mind',
+  imageTargetSrc: './target/TargetsVerdes.mind',
   maxTrack: CONFIG.length,
   // ── FILTROS DE ESTABILIZACIÓN (One Euro Filter) ──
   filterMinCF: 0.0001, 
