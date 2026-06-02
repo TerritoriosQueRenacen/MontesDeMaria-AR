@@ -271,7 +271,7 @@ body {
 /* Stop button in HUD */
 .hud-stop-btn {
   position: absolute;
-  top: 16px;
+  top: 46px;
   right: 60px;
   pointer-events: all;
   font-family: 'Exo 2', sans-serif;
@@ -414,3 +414,14 @@ body {
 }
 
 .hud-hint.hidden { opacity: 0; }
+
+/* ── MOBILE ADJUSTMENTS ── */
+@media (max-width: 768px) {
+  #splash {
+    /* 
+      The first value is horizontal (X), the second is vertical (Y).
+      Increase the percentage (e.g., 60%, 80%, or 'right') to push it further right.
+    */
+    background-position: 63% center; 
+  }
+}
